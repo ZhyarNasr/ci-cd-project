@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Your Docker Hub repository name
-        IMAGE_NAME = "zhyar1/php-app"
+        IMAGE_NAME = "san1123/php-app"
     }
 
     stages {
