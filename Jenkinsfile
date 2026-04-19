@@ -6,7 +6,6 @@ pipeline {
     }
 
     stages {
-
         stage('Clone Repo') {
             steps {
                 git branch: 'main', url: 'https://github.com/ZhyarNasr/ci-cd-project.git'
@@ -15,7 +14,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t %IMAGE_NAME%:latest ."
+                // Corrected variable syntax
+                sh "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
 
@@ -26,16 +26,15 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    sh """
-                    echo %PASS% | docker login -u %USER% --password-stdin
-                    """
+                    // Use double quotes to allow Jenkins to inject the credentials
+                    sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh "docker push %IMAGE_NAME%:latest"
+                sh "docker push ${IMAGE_NAME}:latest"
             }
         }
     }
