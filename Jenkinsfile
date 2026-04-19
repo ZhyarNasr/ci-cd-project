@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        // This MUST match the 'Name' you gave in Global Tool Configuration
+        dockerTool 'docker'
+    }
+
     environment {
         IMAGE_NAME = "zhyar1/php-app"
     }
@@ -8,13 +13,14 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
+                // Ensure this matches your repository
                 git branch: 'main', url: 'https://github.com/ZhyarNasr/ci-cd-project.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                // Corrected variable syntax
+                // Using ${} for Linux/Jenkins environment variables
                 sh "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
@@ -22,11 +28,11 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
+                    credentialsId: 'dockerhub-creds', // Ensure this ID exists in Jenkins Credentials
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    // Use double quotes to allow Jenkins to inject the credentials
+                    // Logs in using the credentials defined in Jenkins
                     sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
                 }
             }
