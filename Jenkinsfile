@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         // This MUST match the 'Name' you gave in Global Tool Configuration
-        dockerTool 'docker'
+        dockerTool 'Docker'
     }
 
     environment {
