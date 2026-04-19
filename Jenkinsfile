@@ -1,23 +1,41 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "zhyar1/php-app"
+    }
+
     stages {
 
-        stage('Build') {
+        stage('Clone Repo') {
             steps {
-                echo 'Building...'
+                git branch: 'main', url: 'https://github.com/ZhyarNasr/ci-cd-project.git'
             }
         }
 
-        stage('Test') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Testing...'
+                bat "docker build -t %IMAGE_NAME%:latest ."
             }
         }
 
-        stage('Docker Build') {
+        stage('Login to Docker Hub') {
             steps {
-                sh 'docker build -t my-app .'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    bat """
+                    echo %PASS% | docker login -u %USER% --password-stdin
+                    """
+                }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                bat "docker push %IMAGE_NAME%:latest"
             }
         }
     }
