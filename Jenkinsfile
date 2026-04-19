@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // Your Docker Hub repository name
+        // Your Docker Hub repository name zhyar
         IMAGE_NAME = "san1123/php-app"
     }
 
