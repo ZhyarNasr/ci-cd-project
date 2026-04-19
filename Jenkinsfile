@@ -21,7 +21,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 // Using ${} for Linux/Jenkins environment variables
-                sh "docker build -t ${IMAGE_NAME}:latest ."
+                bat "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
 
@@ -33,14 +33,14 @@ pipeline {
                     passwordVariable: 'PASS'
                 )]) {
                     // Logs in using the credentials defined in Jenkins
-                    sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
+                    bat "echo ${PASS} | docker login -u ${USER} --password-stdin"
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh "docker push ${IMAGE_NAME}:latest"
+                bat "docker push ${IMAGE_NAME}:latest"
             }
         }
     }
