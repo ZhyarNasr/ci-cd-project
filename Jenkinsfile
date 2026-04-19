@@ -1,46 +1,46 @@
 pipeline {
     agent any
 
-    tools {
-        // This MUST match the 'Name' you gave in Global Tool Configuration
-        dockerTool 'Docker'
-    }
-
     environment {
+        // Your Docker Hub repository name
         IMAGE_NAME = "zhyar1/php-app"
     }
 
     stages {
+        // Stage 1: Jenkins does a 'Declarative Checkout' automatically, 
+        // but this manual stage ensures your files are in the right place.
         stage('Clone Repo') {
             steps {
-                // Ensure this matches your repository
                 git branch: 'main', url: 'https://github.com/ZhyarNasr/ci-cd-project.git'
             }
         }
 
+        // Stage 2: Building the image using Windows Batch (bat)
         stage('Build Docker Image') {
             steps {
-                // Using ${} for Linux/Jenkins environment variables
-                bat "docker build -t ${IMAGE_NAME}:latest ."
+                // In Windows 'bat' blocks, we use %VARIABLE_NAME%
+                bat "docker build -t %IMAGE_NAME%:latest ."
             }
         }
 
+        // Stage 3: Authenticating with Docker Hub
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds', // Ensure this ID exists in Jenkins Credentials
+                    credentialsId: 'dockerhub-creds', 
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    // Logs in using the credentials defined in Jenkins
-                    bat "echo ${PASS} | docker login -u ${USER} --password-stdin"
+                    // Windows echo handles the password pipe slightly differently than Linux
+                    bat "echo %PASS% | docker login -u %USER% --password-stdin"
                 }
             }
         }
 
+        // Stage 4: Pushing the final image
         stage('Push Image') {
             steps {
-                bat "docker push ${IMAGE_NAME}:latest"
+                bat "docker push %IMAGE_NAME%:latest"
             }
         }
     }
